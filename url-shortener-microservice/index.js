@@ -22,6 +22,7 @@ app.get('/', function (req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
+
 // short url API endpoint
 app.post('/api/shorturl', async function (req, res) {
 
@@ -33,11 +34,36 @@ app.post('/api/shorturl', async function (req, res) {
   })
 
   res.json({
-    original_url: url.original_url,
+    original_url: url.originalurl,
     short_url: url.short_url
   });
 
 });
+
+
+app.get('/api/shorturl/:url', async function (req, res) {
+
+  // validation for invalid short url  
+  if (isNaN(req.params.url)) {
+    return res.json({ error: 'Wrong format' })
+  }
+
+
+  const url = await Url.findOne({ short_url: req.params.url })
+
+  // short url not founded
+  if (!url && !isNaN(req.params.url)) {
+
+    return res.json({ error: 'No short URL found for the given input' })
+
+  }
+
+  // redirect to original url with 301 status 
+  res.redirect(301, url.original_url)  
+
+})
+
+
 
 app.listen(port, function () {
   console.log(`Listening on port ${port}`);
