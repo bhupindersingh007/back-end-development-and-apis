@@ -1,7 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const bodyParser= require('body-parser')
+const bodyParser = require('body-parser')
+const mongoose = require('mongoose')
 const app = express();
 
 // Basic Configuration
@@ -13,11 +14,14 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use('/public', express.static(`${process.cwd()}/public`));
 
+mongoose.connect(process.env.MONGO_URI)
+
+
 app.get('/', function(req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
-// Your first API endpoint
+// short url API endpoint
 app.post('/api/shorturl', function(req, res) {
 
   const url = req.body.url 
