@@ -26,17 +26,17 @@ app.get('/', function (req, res) {
 // short url API endpoint
 app.post('/api/shorturl', async function (req, res) {
 
+  let url = await Url.findOne({ original_url: req.body.url })
+
+  if (url) {
+    return res.json({ original_url: url.original_url, short_url: url.short_url })
+  }
+
   const shortUrl = await Url.count() + 1
 
-  const url = await Url.create({
-    original_url: req.body.url,
-    short_url: shortUrl
-  })
+  url = await Url.create({ original_url: req.body.url, short_url: shortUrl })
 
-  res.json({
-    original_url: url.originalurl,
-    short_url: url.short_url
-  });
+  res.json({ original_url: url.originalurl, short_url: url.short_url })
 
 });
 
@@ -59,7 +59,7 @@ app.get('/api/shorturl/:url', async function (req, res) {
   }
 
   // redirect to original url with 301 status 
-  res.redirect(301, url.original_url)  
+  res.redirect(301, url.original_url)
 
 })
 
