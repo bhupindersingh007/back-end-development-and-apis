@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const dns = require('dns')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const uuid = require('uuid')
@@ -26,6 +27,20 @@ app.get('/', function (req, res) {
 
 // short url API endpoint
 app.post('/api/shorturl', async function (req, res) {
+
+  try {
+
+    const data = await dns.promises.lookup(new URL(req.body.url).hostname)
+
+    console.log(data)
+
+  } catch (e) {
+
+    console.log(e)
+
+    return res.json({ error: 'Invalid URL' })
+
+  }
 
   let url = await Url.findOne({ original_url: req.body.url })
 
