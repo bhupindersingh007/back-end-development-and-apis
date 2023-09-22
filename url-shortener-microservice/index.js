@@ -1,4 +1,4 @@
-require('dotenv').config();
+const dotenv = require('dotenv')
 const express = require('express');
 const cors = require('cors');
 const dns = require('dns')
@@ -7,6 +7,8 @@ const mongoose = require('mongoose')
 const uuid = require('uuid')
 const Url = require('./models/Url')
 const app = express();
+
+dotenv.config()
 
 // Basic Configuration
 const port = process.env.PORT || 3000;
