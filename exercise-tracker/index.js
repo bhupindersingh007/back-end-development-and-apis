@@ -20,13 +20,11 @@ app.get('/', (req, res) => {
 
 
 // list all users
-app.get('/api/users', (req, res) => {
+app.get('/api/users', async (req, res) => {
 
-  res.json([
-    { _id: 1, username: 'username1' },
-    { _id: 2, username: 'username2' },
-    { _id: 3, username: 'username3' },
-  ]);
+  const users = await User.find({})
+
+  res.json(users);
 
 })
 
