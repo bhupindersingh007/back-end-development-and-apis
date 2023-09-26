@@ -4,6 +4,7 @@ const cors = require('cors')
 const dotenv = require('dotenv')
 const mongoose = require('mongoose')
 const User = require('./models/User')
+const Exercise = require('./models/Exercise')
 
 dotenv.config()
 
@@ -41,16 +42,23 @@ app.post('/api/users', async (req, res) => {
 })
 
 
-// store user exerices
-app.post('/api/users/:_id/exercises', (req, res) => {
+// store user exercise
+app.post('/api/users/:_id/exercises', async (req, res) => {
 
-  res.json({
-    username: 'someone',
-    description: 'something',
-    duration: 60,
-    date: 'Mon Jan 02 1990',
-    _id: '5fb5853f734231456ccb3b05'
+
+  let exerciseDate = req.body.date 
+    ? new Date(req.body.date).toDateString() 
+    : new Date().toDateString()
+
+
+  const exercise = await Exercise({
+    user_id : req.body.user_id,
+    description : req.body.description,
+    duration : req.body.duration,
+    date : exerciseDate
   })
+
+  res.json(exercise)
 
 })
 
