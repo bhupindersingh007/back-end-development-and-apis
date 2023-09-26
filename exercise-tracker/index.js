@@ -51,14 +51,22 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
     : new Date().toDateString()
 
 
-  const exercise = await Exercise({
-    user_id : req.body.user_id,
+  let exercise = await Exercise.create({
+    user : req.body._id,
     description : req.body.description,
     duration : req.body.duration,
     date : exerciseDate
   })
 
-  res.json(exercise)
+  exercise = await exercise.populate('user')
+
+  res.json({
+    _id : exercise.user._id,
+    username : exercise.user.username,
+    description : exercise.description,
+    duration : exercise.duration,
+    date : exercise.date
+  })
 
 })
 
