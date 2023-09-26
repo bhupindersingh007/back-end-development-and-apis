@@ -46,43 +46,45 @@ app.post('/api/users', async (req, res) => {
 app.post('/api/users/:_id/exercises', async (req, res) => {
 
 
-  let exerciseDate = req.body.date 
-    ? new Date(req.body.date).toDateString() 
+  let exerciseDate = req.body.date
+    ? new Date(req.body.date).toDateString()
     : new Date().toDateString()
 
 
   let exercise = await Exercise.create({
-    user : req.body._id,
-    description : req.body.description,
-    duration : req.body.duration,
-    date : exerciseDate
+    user: req.params._id,
+    description: req.body.description,
+    duration: req.body.duration,
+    date: exerciseDate
   })
 
   exercise = await exercise.populate('user')
 
   res.json({
-    _id : exercise.user._id,
-    username : exercise.user.username,
-    description : exercise.description,
-    duration : exercise.duration,
-    date : exercise.date
+    _id: exercise.user._id,
+    username: exercise.user.username,
+    description: exercise.description,
+    duration: exercise.duration,
+    date: exercise.date
   })
 
 })
 
 
 // user logs
-app.get('/api/users/:_id/logs', (req, res) => {
+app.get('/api/users/:_id/logs', async (req, res) => {
 
-  res.json({
-    username: 'someone',
-    count: 1,
-    _id: '5fb5853f734231456ccb3b05',
-    log: [
-      { description: 'something', duration: 60, date: 'Mon Jan 01 1990' },
-      { description: 'something', duration: 60, date: 'Mon Jan 02 1990' },
-      { description: 'something', duration: 60, date: 'Mon Jan 03 1990' },
-    ]
+  const user = await User.findOne({ _id: req.params._id })
+
+  const exerciseCount = await Exercise.find({ user: req.params._id }).count()
+
+  const exercises = await Exercise.find({ user: req.params._id }).select('-_id description duration date')
+
+  return res.json({
+    _id: user._id,
+    username: user.username,
+    count: exerciseCount,
+    log: exercises
   })
 
 })
