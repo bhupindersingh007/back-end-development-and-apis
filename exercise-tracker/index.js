@@ -72,18 +72,32 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
 
 
 // user logs
-app.get('/api/users/:_id/logs', async (req, res) => {
+app.get('/api/users/:_id/logs', async (req, res, next) => {
 
   const user = await User.findOne({ _id: req.params._id })
 
-  const exerciseCount = await Exercise.find({ user: req.params._id }).count()
+  let exercises = await Exercise.find({ user: req.params._id }).select('-_id description duration date')
 
-  const exercises = await Exercise.find({ user: req.params._id }).select('-_id description duration date')
+  if (req.query.from && req.query.to) {
+
+    const fromDate = new Date(req.query.from).getTime()
+    const toDate = new Date(req.query.to).getTime()
+
+    exercises = exercises.filter(exercise => new Date(exercise.date).getTime() >= fromDate && new Date(exercise.date).getTime() <= toDate)
+
+  }
+
+
+  if (req.query.limit) {
+
+    exercises = exercises.slice(0, req.query.limit)
+
+  }
 
   return res.json({
     _id: user._id,
     username: user.username,
-    count: exerciseCount,
+    count: exercises.length,
     log: exercises
   })
 
